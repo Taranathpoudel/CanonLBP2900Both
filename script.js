@@ -18,10 +18,23 @@ processBtn.addEventListener("click", async () => {
   const fileReader = new FileReader();
 
   fileReader.onload = async function () {
-    try {
-      const pdfDoc = await PDFLib.PDFDocument.load(fileReader.result);
-      const pages = pdfDoc.getPages();
-      const numPages = pages.length;
+  try {
+    const pdfDoc = await PDFLib.PDFDocument.load(fileReader.result);
+    console.log("PDF loaded successfully");
+
+    const pages = pdfDoc.getPages();
+    if (pages.length === 0) {
+      status.textContent = "No pages found in the PDF.";
+      return;
+    }
+
+    // PDF manipulation logic...
+  } catch (error) {
+    console.error("Error loading PDF:", error);
+    status.textContent = "Failed to process PDF: " + error.message;
+  }
+};
+
 
       // Add a blank page if the number of pages is odd
       if (numPages % 2 !== 0) {
