@@ -1,4 +1,4 @@
-goto: canonprinter.netlify.app to use as a web app
+goto: www.canonprinter.netlify.app to use as a web app
 # CanonLBP2900Both
 This web based application helps to print the document sequently when the printer doesn't provide the functionality to print on both sides
 Steps:
