@@ -82,8 +82,3 @@ This tool is open-source and free to use. You can modify or distribute it accord
 ## Contact
 If you have any questions or feedback, feel free to reach out to:
 - **Developer:** Er. Tara Nath Poudel
-- **Email:** [Insert your email address]
-
----
-
-Feel free to adjust the contact section and any other details as needed! This README should provide users with clear instructions on how to use the tool and what it does.
