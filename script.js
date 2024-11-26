@@ -2,12 +2,16 @@ const pdfInput = document.getElementById("pdfInput");
 const processBtn = document.getElementById("processBtn");
 const downloadBtn = document.getElementById("downloadBtn");
 const status = document.getElementById("status");
+const progressContainer = document.getElementById("progressContainer");
+const uploadProgress = document.getElementById("uploadProgress");
+const progressPercentage = document.getElementById("progressPercentage");
 
 let modifiedPdfBytes;
 
 // Enable the Process button after file selection
 pdfInput.addEventListener("change", () => {
   processBtn.disabled = !pdfInput.files.length;
+  progressContainer.style.display = 'none'; // Hide progress bar initially
 });
 
 // Process the PDF
@@ -16,6 +20,22 @@ processBtn.addEventListener("click", async () => {
 
   const file = pdfInput.files[0];
   const fileReader = new FileReader();
+
+  // Show the progress bar when file starts loading
+  progressContainer.style.display = 'block';
+
+  fileReader.onloadstart = () => {
+    uploadProgress.value = 0;
+    progressPercentage.textContent = '0%';
+  };
+
+  fileReader.onprogress = (event) => {
+    if (event.lengthComputable) {
+      const progress = (event.loaded / event.total) * 100;
+      uploadProgress.value = progress;
+      progressPercentage.textContent = `${Math.round(progress)}%`;
+    }
+  };
 
   fileReader.onload = async function () {
     try {
@@ -61,9 +81,11 @@ processBtn.addEventListener("click", async () => {
       modifiedPdfBytes = await newPdfDoc.save();
       downloadBtn.disabled = false;
       status.textContent = "PDF processed successfully!";
+      progressContainer.style.display = 'none'; // Hide progress bar after completion
     } catch (error) {
       console.error("Error processing PDF:", error);
       status.textContent = "Failed to process PDF.";
+      progressContainer.style.display = 'none'; // Hide progress bar after failure
     }
   };
 

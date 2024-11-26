@@ -20,6 +20,13 @@
     <button id="processBtn" disabled>Process PDF</button>
     <button id="downloadBtn" disabled>Download Processed PDF</button>
     <p id="status"></p>
+
+    <!-- Progress Bar for Uploading -->
+    <div id="progressContainer" style="display: none;">
+      <label for="uploadProgress">Upload Progress:</label>
+      <progress id="uploadProgress" value="0" max="100"></progress>
+      <span id="progressPercentage">0%</span>
+    </div>
   </div>
 
   <!-- Include PDFLib for PDF processing -->
