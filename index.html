@@ -3,18 +3,28 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>PDF Page Reorder</title>
+  <title>PDF Processor</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div class="container">
-    <h1>PDF Page Reorder Tool</h1>
+
+  <!-- Banner Section -->
+  <div class="banner">
+    <h1>Made by Er. Tara Nath Poudel</h1>
+  </div>
+
+  <!-- Main Content -->
+  <div class="content">
+    <h2>PDF Processor</h2>
     <input type="file" id="pdfInput" accept="application/pdf">
     <button id="processBtn" disabled>Process PDF</button>
-    <button id="downloadBtn" disabled>Download PDF</button>
+    <button id="downloadBtn" disabled>Download Processed PDF</button>
     <p id="status"></p>
   </div>
+
+  <!-- Include PDFLib for PDF processing -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
   <script src="script.js"></script>
+
 </body>
 </html>
