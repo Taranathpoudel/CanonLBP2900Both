@@ -18,37 +18,25 @@ processBtn.addEventListener("click", async () => {
   const fileReader = new FileReader();
 
   fileReader.onload = async function () {
-  try {
-    const pdfDoc = await PDFLib.PDFDocument.load(fileReader.result);
-    console.log("PDF loaded successfully");
+    try {
+      const pdfDoc = await PDFLib.PDFDocument.load(fileReader.result);
+      const pages = pdfDoc.getPages();
+      const numPages = pages.length;
 
-    const pages = pdfDoc.getPages();
-    if (pages.length === 0) {
-      status.textContent = "No pages found in the PDF.";
-      return;
-    }
-
-    // PDF manipulation logic...
-  } catch (error) {
-    console.error("Error loading PDF:", error);
-    status.textContent = "Failed to process PDF: " + error.message;
-  }
-};
-
-
-      // Add a blank page if the number of pages is odd
+      // Add a blank page at the end if the PDF ends at an odd page
       if (numPages % 2 !== 0) {
-        pdfDoc.addPage();
+        pdfDoc.addPage();  // Add blank page at the end
       }
 
-      // Separate odd and even pages
+      // Now that the page count is even, separate odd and even pages
       const oddPages = [];
       const evenPages = [];
-      pages.forEach((page, index) => {
+      const allPages = pdfDoc.getPages();  // Get updated pages including the new blank page if added
+      allPages.forEach((page, index) => {
         if ((index + 1) % 2 === 0) {
-          evenPages.push(page);
+          evenPages.push(index); // Save the index of even pages
         } else {
-          oddPages.push(page);
+          oddPages.push(index); // Save the index of odd pages
         }
       });
 
@@ -60,11 +48,11 @@ processBtn.addEventListener("click", async () => {
 
       // Add pages in alternating order
       for (let i = 0; i < oddPages.length; i++) {
-        const [oddPage] = await newPdfDoc.copyPages(pdfDoc, [oddPages[i].getIndex()]);
+        const [oddPage] = await newPdfDoc.copyPages(pdfDoc, [oddPages[i]]);
         newPdfDoc.addPage(oddPage);
 
         if (i < evenPages.length) {
-          const [evenPage] = await newPdfDoc.copyPages(pdfDoc, [evenPages[i].getIndex()]);
+          const [evenPage] = await newPdfDoc.copyPages(pdfDoc, [evenPages[i]]);
           newPdfDoc.addPage(evenPage);
         }
       }
