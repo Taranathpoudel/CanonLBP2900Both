@@ -43,15 +43,34 @@ processBtn.addEventListener("click", async () => {
       const pages = pdfDoc.getPages();
       const numPages = pages.length;
 
+      // Add page numbers to each page
+      pages.forEach((page, index) => {
+        const { width, height } = page.getSize();
+        page.drawText(`Page ${index + 1}`, {
+          x: width / 2 - 20,
+          y: 20,
+          size: 12,
+          color: PDFLib.rgb(0, 0, 0), // Black color
+        });
+      });
+
       // Add a blank page at the end if the PDF ends at an odd page
       if (numPages % 2 !== 0) {
-        pdfDoc.addPage();  // Add blank page at the end
+        const blankPage = pdfDoc.addPage(); // Add blank page at the end
+        const { width, height } = blankPage.getSize();
+        blankPage.drawText("Blank Page", {
+          x: width / 2 - 40,
+          y: height / 2,
+          size: 18,
+          color: PDFLib.rgb(0.5, 0.5, 0.5), // Grey color
+          opacity: 0.7,
+        });
       }
 
       // Now that the page count is even, separate odd and even pages
       const oddPages = [];
       const evenPages = [];
-      const allPages = pdfDoc.getPages();  // Get updated pages including the new blank page if added
+      const allPages = pdfDoc.getPages(); // Get updated pages including the new blank page if added
       allPages.forEach((page, index) => {
         if ((index + 1) % 2 === 0) {
           evenPages.push(index); // Save the index of even pages
