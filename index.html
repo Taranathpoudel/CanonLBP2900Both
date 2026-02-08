@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>PDF Processor</title>
+  <title>PDF Processor - Booklet Mode</title>
   <style>
     /* Body styles */
     body {
@@ -16,8 +16,8 @@
 
     /* Fancy Banner Styles */
     .banner {
-      background-color: #000; /* Black background */
-      color: white; /* White text */
+      background-color: #000;
+      color: white;
       text-align: center;
       padding: 20px;
       font-family: 'Arial', sans-serif;
@@ -25,6 +25,7 @@
       box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
       position: relative;
       margin-bottom: 30px;
+      border-bottom: 1px solid #333;
     }
 
     .banner h1 {
@@ -32,44 +33,36 @@
       font-size: 32px;
       text-transform: uppercase;
       letter-spacing: 2px;
+      /* RGB Gradient Text */
       background: linear-gradient(90deg, red, yellow, green, cyan, blue, magenta, red);
+      background-size: 400%;
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
-      animation: rgbText 3s infinite;
+      animation: rgbText 3s linear infinite;
     }
 
     /* RGB Text Animation */
     @keyframes rgbText {
-      0% {
-        filter: drop-shadow(0 0 5px red) drop-shadow(0 0 10px orange);
-      }
-      25% {
-        filter: drop-shadow(0 0 5px yellow) drop-shadow(0 0 10px green);
-      }
-      50% {
-        filter: drop-shadow(0 0 5px cyan) drop-shadow(0 0 10px blue);
-      }
-      75% {
-        filter: drop-shadow(0 0 5px magenta) drop-shadow(0 0 10px red);
-      }
-      100% {
-        filter: drop-shadow(0 0 5px red) drop-shadow(0 0 10px orange);
-      }
+      0% { background-position: 0%; filter: drop-shadow(0 0 5px red); }
+      50% { background-position: 100%; filter: drop-shadow(0 0 5px cyan); }
+      100% { background-position: 0%; filter: drop-shadow(0 0 5px red); }
     }
 
     /* Main Content */
     .content {
       text-align: center;
-      margin: 20px;
+      margin: 20px auto;
+      max-width: 600px;
     }
 
     .content h2 {
       font-size: 28px;
-      color: white; /* White text for contrast */
+      color: white;
+      margin-bottom: 30px;
     }
 
     button {
-      padding: 10px 20px;
+      padding: 12px 24px;
       font-size: 16px;
       margin: 10px;
       cursor: pointer;
@@ -77,22 +70,26 @@
       background-color: #4CAF50;
       color: white;
       border-radius: 5px;
-      transition: background-color 0.3s;
+      transition: background-color 0.3s, transform 0.1s;
     }
 
     button:disabled {
       cursor: not-allowed;
-      opacity: 0.5;
+      background-color: #333;
+      color: #777;
+      opacity: 0.8;
     }
 
-    button:hover {
+    button:hover:not(:disabled) {
       background-color: #45a049;
+      transform: scale(1.05);
     }
 
     #status {
       font-size: 18px;
-      color: white; /* White text for contrast */
+      color: #ddd;
       margin-top: 20px;
+      min-height: 24px;
     }
 
     input[type="file"] {
@@ -101,54 +98,249 @@
       margin: 20px;
       border: 2px solid #4CAF50;
       border-radius: 5px;
-      background-color: #000; /* Black background */
-      color: white; /* White text */
+      background-color: #111;
+      color: white;
+      width: 80%;
+    }
+    
+    /* Checkbox Styling */
+    .checkbox-container {
+      margin: 15px 0;
+      font-size: 18px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    input[type="checkbox"] {
+      width: 20px;
+      height: 20px;
+      cursor: pointer;
     }
 
     /* Progress bar container */
     #progressContainer {
       margin-top: 20px;
+      width: 80%;
+      margin-left: auto;
+      margin-right: auto;
+      text-align: left;
+    }
+
+    label { display: block; margin-bottom: 5px; }
+    
+    /* Override for checkbox label to be inline */
+    .checkbox-container label {
+      display: inline;
+      margin: 0;
+      cursor: pointer;
     }
 
     progress {
       width: 100%;
       height: 20px;
-      margin: 10px 0;
+      display: block;
+      margin-bottom: 5px;
     }
 
     #progressPercentage {
-      font-size: 18px;
-      color: white; /* White text for contrast */
-      display: block;
+      float: right;
+      color: #aaa;
     }
   </style>
 </head>
 <body>
 
-  <!-- Banner Section -->
   <div class="banner">
     <h1>ई. तारा नाथ पौडेल</h1>
   </div>
 
-  <!-- Main Content -->
   <div class="content">
-    <h2>PDF Processor</h2>
+    <h2>Booklet PDF Processor</h2>
     <input type="file" id="pdfInput" accept="application/pdf">
-    <button id="processBtn" disabled>Process PDF</button>
-    <button id="downloadBtn" disabled>Download Processed PDF</button>
-    <p id="status"></p>
+    
+    <div class="checkbox-container">
+      <input type="checkbox" id="addPageNumbers" checked>
+      <label for="addPageNumbers">Add Page Numbers</label>
+    </div>
 
-    <!-- Progress Bar for Uploading -->
+    <button id="processBtn" disabled>Process PDF</button>
+    <button id="downloadBtn" disabled>Download Result</button>
+    
     <div id="progressContainer" style="display: none;">
-      <label for="uploadProgress">Upload Progress:</label>
+      <label for="uploadProgress">Processing Status:</label>
       <progress id="uploadProgress" value="0" max="100"></progress>
       <span id="progressPercentage">0%</span>
     </div>
+
+    <p id="status"></p>
   </div>
 
-  <!-- Include PDFLib for PDF processing -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
-  <script src="script.js"></script>
+  
+  <script>
+    const pdfInput = document.getElementById("pdfInput");
+    const processBtn = document.getElementById("processBtn");
+    const downloadBtn = document.getElementById("downloadBtn");
+    const status = document.getElementById("status");
+    const progressContainer = document.getElementById("progressContainer");
+    const uploadProgress = document.getElementById("uploadProgress");
+    const progressPercentage = document.getElementById("progressPercentage");
+    const addPageNumbersCheckbox = document.getElementById("addPageNumbers"); // New Reference
+
+    let modifiedPdfBytes;
+
+    // Helper to update progress UI
+    function updateProgress(value, text) {
+      uploadProgress.value = value;
+      progressPercentage.textContent = text || `${Math.round(value)}%`;
+    }
+
+    // Enable the Process button after file selection
+    pdfInput.addEventListener("change", () => {
+      if (pdfInput.files.length > 0) {
+        processBtn.disabled = false;
+        downloadBtn.disabled = true;
+        status.textContent = "File selected. Ready to process.";
+      } else {
+        processBtn.disabled = true;
+      }
+      progressContainer.style.display = 'none';
+    });
+
+    // Process the PDF
+    processBtn.addEventListener("click", async () => {
+      if (!pdfInput.files.length) return;
+
+      const file = pdfInput.files[0];
+      const fileReader = new FileReader();
+
+      // UI Reset
+      progressContainer.style.display = 'block';
+      status.textContent = "Reading file...";
+      updateProgress(0);
+      processBtn.disabled = true;
+      downloadBtn.disabled = true;
+
+      fileReader.onprogress = (event) => {
+        if (event.lengthComputable) {
+          const progress = (event.loaded / event.total) * 30; // Allocate 30% for upload
+          updateProgress(progress);
+        }
+      };
+
+      fileReader.onload = async function () {
+        try {
+          status.textContent = "Parsing PDF...";
+          const pdfDoc = await PDFLib.PDFDocument.load(fileReader.result);
+          
+          updateProgress(40);
+          
+          let pages = pdfDoc.getPages();
+          let numPages = pages.length;
+
+          // 1. CONDITIONAL Add page numbers
+          if (addPageNumbersCheckbox.checked) {
+            status.textContent = "Adding page numbers...";
+            pages.forEach((page, index) => {
+              const { width, height } = page.getSize();
+              page.drawText(`${index + 1}`, {
+                x: width / 2 - 5,
+                y: 20,
+                size: 12,
+                color: PDFLib.rgb(0, 0, 0),
+              });
+            });
+          } else {
+            status.textContent = "Skipping page numbers...";
+          }
+
+          // 2. Add Blank Page if Odd
+          if (numPages % 2 !== 0) {
+            status.textContent = "Adding blank page to make count even...";
+            const blankPage = pdfDoc.addPage();
+            const { width, height } = blankPage.getSize();
+            // Optional: Only write "Blank Page" text if page numbers are also requested?
+            // Leaving it as is so you know it's intentional.
+            blankPage.drawText("Blank Page (Intentionally Added)", {
+              x: width / 2 - 100,
+              y: height / 2,
+              size: 18,
+              color: PDFLib.rgb(0.7, 0.7, 0.7),
+            });
+          }
+
+          updateProgress(60);
+
+          // 3. Re-calculate logic with new page count
+          const allPagesCount = pdfDoc.getPageCount();
+          const oddIndices = [];
+          const evenIndices = [];
+
+          for (let i = 0; i < allPagesCount; i++) {
+            if ((i + 1) % 2 === 0) {
+              evenIndices.push(i);
+            } else {
+              oddIndices.push(i);
+            }
+          }
+
+          // Reverse evens for booklet printing logic
+          evenIndices.reverse();
+
+          // Create the Order Array
+          const finalOrder = [];
+          for (let i = 0; i < oddIndices.length; i++) {
+            finalOrder.push(oddIndices[i]); // Add Front
+            if (i < evenIndices.length) {
+              finalOrder.push(evenIndices[i]); // Add Back (reversed)
+            }
+          }
+
+          // 4. Create New Doc
+          status.textContent = "Reordering pages...";
+          const newPdfDoc = await PDFLib.PDFDocument.create();
+          
+          // Copy pages based on order
+          const copiedPages = await newPdfDoc.copyPages(pdfDoc, finalOrder);
+
+          // Add them to the new doc
+          copiedPages.forEach((page) => newPdfDoc.addPage(page));
+
+          updateProgress(90);
+          status.textContent = "Finalizing PDF...";
+
+          // 5. Save
+          modifiedPdfBytes = await newPdfDoc.save();
+          
+          updateProgress(100);
+          status.textContent = "Success! PDF is ready.";
+          
+          // Enable Download
+          downloadBtn.disabled = false;
+          processBtn.disabled = false;
+
+        } catch (error) {
+          console.error("Error processing PDF:", error);
+          status.textContent = "Error: " + error.message;
+          processBtn.disabled = false;
+        }
+      };
+
+      fileReader.readAsArrayBuffer(file);
+    });
+
+    // Download
+    downloadBtn.addEventListener("click", () => {
+      if (!modifiedPdfBytes) return;
+      const blob = new Blob([modifiedPdfBytes], { type: "application/pdf" });
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = "booklet-output.pdf";
+      link.click();
+    });
+  </script>
 
 </body>
 </html>
